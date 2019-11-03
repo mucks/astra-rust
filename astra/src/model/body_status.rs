@@ -1,4 +1,4 @@
-#[derive(FromPrimitive, Debug, PartialEq)]
+#[derive(FromPrimitive, Debug, Clone, PartialEq)]
 pub enum BodyStatus {
     NotTracking,
     Lost,

@@ -1,4 +1,4 @@
-#[derive(FromPrimitive, Debug)]
+#[derive(FromPrimitive, Debug, Clone, PartialEq)]
 pub enum JointStatus {
     NotTracked,
     LowConfidence,

@@ -5,6 +5,7 @@ extern crate astra_sys as sys;
 use std::ffi::CString;
 
 mod model;
+pub use model::*;
 
 mod body;
 pub use body::*;

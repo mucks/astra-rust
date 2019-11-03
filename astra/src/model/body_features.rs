@@ -1,4 +1,4 @@
-#[derive(FromPrimitive, Debug)]
+#[derive(FromPrimitive, Debug, Clone, PartialEq)]
 pub enum BodyFeatures {
     TrackingSegmentation = 0,
     TrackingJoints = 1,

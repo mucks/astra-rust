@@ -1,4 +1,4 @@
-#[derive(FromPrimitive, Hash, PartialEq, Eq, Debug)]
+#[derive(FromPrimitive, Clone, Hash, PartialEq, Eq, Debug)]
 pub enum JointType {
     Head,
     ShoulderSpine,
