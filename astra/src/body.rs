@@ -13,7 +13,7 @@ pub fn start_body_stream(reader: Reader) -> Stream {
     unsafe { start_stream(reader, StreamType::Body) }
 }
 
-pub fn get_body_frame(frame: Frame) -> BodyFrame {
+pub fn get_body_frame(frame: AstraFrame) -> BodyFrame {
     unsafe {
         let mut body_frame = Box::into_raw(Box::new(sys::_astra_bodyframe::default())) as BodyFrame;
         sys::astra_frame_get_bodyframe(frame, &mut body_frame);

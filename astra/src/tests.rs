@@ -1,10 +1,11 @@
 use super::*;
-
+/*
 #[test]
+#[ignore]
 fn test_body_stream() {
     init();
-    let sensor = get_sensor();
-    let reader = get_reader(sensor);
+    let mut sensor = get_sensor();
+    let mut reader = get_reader(sensor);
     let s = start_body_stream(reader);
     let mut index = -1;
     while index < 100 {
@@ -25,5 +26,24 @@ fn test_body_stream() {
         }
     }
     stop_stream(s);
+    close_reader(&mut reader);
+    close_sensor(&mut sensor);
     terminate();
+}
+*/
+
+#[test]
+fn test_color_stream() {
+    let mut sensor = sensor::Sensor::new();
+    if sensor.start().is_ok() {
+        if sensor.start_color_stream().is_ok() {
+            let mut index = -1;
+            while index < 100 {
+                update();
+                if let Ok(bytes) = sensor.get_color_bytes() {
+                    index += 1;
+                }
+            }
+        }
+    }
 }
