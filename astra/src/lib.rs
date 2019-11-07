@@ -123,6 +123,12 @@ pub fn get_color_frame(frame: Frame) -> ImageFrame {
     get_image_frame(frame, false)
 }
 
+pub fn stop_reader(reader: &mut Reader) {
+    unsafe {
+        sys::astra_reader_destroy(reader);
+    }
+}
+
 pub unsafe fn get_masked_color_frame(frame: Frame) -> ImageFrame {
     get_image_frame(frame, true)
 }
