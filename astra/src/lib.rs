@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 #[macro_use]
 extern crate num_derive;
 extern crate astra_sys as sys;
@@ -25,6 +27,14 @@ pub type MaskedColorFrame = sys::astra_maskedcolorframe_t;
 
 #[derive(Hash, PartialEq, Clone, Copy, Eq, Debug)]
 pub enum StreamType {
+    Body,
+    Color,
+    MaskedColor,
+}
+
+#[derive(Debug)]
+pub enum FrameType {
+    Frame,
     Body,
     Color,
     MaskedColor,
@@ -77,10 +87,10 @@ fn start_stream(reader: Reader, stream_type: StreamType) -> Stream {
     }
 }
 pub fn start_masked_color_stream(reader: Reader) -> Stream {
-    unsafe { start_stream(reader, StreamType::MaskedColor) }
+    start_stream(reader, StreamType::MaskedColor)
 }
 pub fn start_color_stream(reader: Reader) -> Stream {
-    unsafe { start_stream(reader, StreamType::Color) }
+    start_stream(reader, StreamType::Color)
 }
 
 pub fn stop_stream(stream: Stream) {
@@ -160,10 +170,8 @@ pub fn get_color_frame_dimensions(color_frame: ColorFrame) -> (u32, u32) {
 }
 
 //ByteArray::new().write().as_mut_ptr()
-pub fn get_color_byte_array(color_frame: sys::astra_colorframe_t, ptr: *mut u8) {
-    unsafe {
-        sys::astra_colorframe_copy_data(color_frame, ptr);
-    }
+pub unsafe fn get_color_byte_array(color_frame: sys::astra_colorframe_t, ptr: *mut u8) {
+    sys::astra_colorframe_copy_data(color_frame, ptr);
 }
 
 pub fn close_reader(reader: &mut Reader) {

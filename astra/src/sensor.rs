@@ -1,6 +1,5 @@
 use super::*;
 use crate::err::Error;
-use crate::frame::Frame;
 use std::collections::HashMap;
 
 pub struct Sensor {
@@ -34,6 +33,20 @@ impl Sensor {
             Err(Error::SensorAlreadyStartedError)
         }
     }
+
+    pub fn get_bodies(&mut self) -> Result<Vec<Body>, Error> {
+        if let Some(reader) = self.reader {
+            if let Ok(frame) = frame::Frame::new(reader) {
+                let body_frame = frame.get_body_frame();
+                Ok(get_bodies(body_frame))
+            } else {
+                Err(Error::CouldNotGetFrameError(FrameType::Body))
+            }
+        } else {
+            Err(Error::StreamNotStartedError(StreamType::Body))
+        }
+    }
+
     pub fn get_color_bytes(&mut self) -> Result<Vec<u8>, Error> {
         if let Some(reader) = self.reader {
             if let Ok(frame) = frame::Frame::new(reader) {
@@ -48,7 +61,7 @@ impl Sensor {
                     Err(Error::NoNewFrameError)
                 }
             } else {
-                Err(Error::CouldNotGetFrameError)
+                Err(Error::CouldNotGetFrameError(FrameType::Color))
             }
         } else {
             Err(Error::StreamNotStartedError(StreamType::Color))

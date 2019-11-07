@@ -7,15 +7,18 @@ pub struct Frame {
 
 impl Frame {
     pub fn new(reader: Reader) -> Result<Frame, Error> {
-        if let Some(mut frame) = get_frame(reader) {
-            Ok(Frame { frame: frame })
+        if let Some(frame) = get_frame(reader) {
+            Ok(Frame { frame })
         } else {
-            Err(Error::CouldNotGetFrameError)
+            Err(Error::CouldNotGetFrameError(FrameType::Frame))
         }
     }
 
     pub fn get_color_frame(&self) -> ColorFrame {
         get_color_frame(self.frame)
+    }
+    pub fn get_body_frame(&self) -> BodyFrame {
+        get_body_frame(self.frame)
     }
 }
 

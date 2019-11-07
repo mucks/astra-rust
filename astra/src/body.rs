@@ -10,7 +10,7 @@ pub fn get_body_frame_index(body_frame: BodyFrame) -> i32 {
 }
 
 pub fn start_body_stream(reader: Reader) -> Stream {
-    unsafe { start_stream(reader, StreamType::Body) }
+    start_stream(reader, StreamType::Body)
 }
 
 pub fn get_body_frame(frame: AstraFrame) -> BodyFrame {
