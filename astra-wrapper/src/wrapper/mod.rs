@@ -15,20 +15,17 @@ pub use stream::*;
 pub use stream_set::*;
 pub use types::*;
 
-pub fn update() {
-    unsafe {
-        sys::astra_update();
-    }
+use crate::util::astra_status_to_result;
+use model::Result;
+
+pub fn update() -> Result<()> {
+    unsafe { astra_status_to_result(sys::astra_update().into(), ()) }
 }
 
-pub fn init() {
-    unsafe {
-        sys::astra_initialize();
-    }
+pub fn init() -> Result<()> {
+    unsafe { astra_status_to_result(sys::astra_initialize().into(), ()) }
 }
 
-pub fn terminate() {
-    unsafe {
-        sys::astra_terminate();
-    }
+pub fn terminate() -> Result<()> {
+    unsafe { astra_status_to_result(sys::astra_terminate().into(), ()) }
 }

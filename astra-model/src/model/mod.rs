@@ -1,6 +1,10 @@
+mod astra_status;
 mod body;
 mod body_features;
 mod body_status;
+mod color_data;
+mod color_meta;
+mod err;
 mod frame_type;
 mod joint;
 mod joint_status;
@@ -9,9 +13,13 @@ mod stream_type;
 mod vector2;
 mod vector3;
 
+pub use astra_status::*;
 pub use body::*;
 pub use body_features::*;
 pub use body_status::*;
+pub use color_data::*;
+pub use color_meta::*;
+pub use err::*;
 pub use frame_type::*;
 pub use joint::*;
 pub use joint_status::*;

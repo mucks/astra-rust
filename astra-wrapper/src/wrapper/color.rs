@@ -1,11 +1,13 @@
 use super::types::{AstraFrame, ColorFrame};
+use crate::util::astra_status_to_result;
+use model::{Error, Result};
 
-pub fn get_color_frame(frame: AstraFrame) -> ColorFrame {
+pub fn get_color_frame(frame: AstraFrame) -> Result<ColorFrame> {
     unsafe {
         let mut color_frame =
             Box::into_raw(Box::new(sys::_astra_imageframe::default())) as ColorFrame;
-        sys::astra_frame_get_colorframe(frame, &mut color_frame);
-        color_frame
+        let status = sys::astra_frame_get_colorframe(frame, &mut color_frame);
+        astra_status_to_result(status.into(), color_frame)
     }
 }
 
@@ -33,11 +35,14 @@ pub fn get_color_frame_dimensions(color_frame: ColorFrame) -> (u32, u32) {
 }
 
 //ByteArray::new().write().as_mut_ptr()
-pub unsafe fn get_color_byte_array(color_frame: sys::astra_colorframe_t, ptr: *mut u8) {
-    sys::astra_colorframe_copy_data(color_frame, ptr);
+pub fn get_color_byte_array(color_frame: ColorFrame, ptr: *mut u8) -> Result<()> {
+    unsafe {
+        let status = sys::astra_colorframe_copy_data(color_frame, ptr);
+        astra_status_to_result(status.into(), ())
+    }
 }
 
-pub fn get_color_bytes(color_frame: sys::astra_colorframe_t, byte_length: u32) -> Vec<u8> {
+pub fn get_color_bytes(color_frame: ColorFrame, byte_length: u32) -> Vec<u8> {
     let mut data: Vec<u8> = Vec::new();
     data.resize(byte_length as usize, 0);
     unsafe {

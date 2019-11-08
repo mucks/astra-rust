@@ -1,6 +1,6 @@
 use super::stream::start_stream;
 use super::types::*;
-use model::{Body, StreamType};
+use model::{Body, Result, StreamType};
 
 pub fn get_body_frame_index(body_frame: BodyFrame) -> i32 {
     unsafe {
@@ -10,7 +10,7 @@ pub fn get_body_frame_index(body_frame: BodyFrame) -> i32 {
     }
 }
 
-pub fn start_body_stream(reader: Reader) -> Stream {
+pub fn start_body_stream(reader: Reader) -> Result<Stream> {
     start_stream(reader, StreamType::Body)
 }
 

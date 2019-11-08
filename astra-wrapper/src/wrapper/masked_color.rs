@@ -1,8 +1,8 @@
 use super::stream::start_stream;
 use super::types::*;
-use model::StreamType;
+use model::{Error, StreamType};
 
-pub fn start_masked_color_stream(reader: Reader) -> Stream {
+pub fn start_masked_color_stream(reader: Reader) -> Result<Stream, Error> {
     start_stream(reader, StreamType::MaskedColor)
 }
 pub unsafe fn get_masked_color_frame(frame: AstraFrame) -> ImageFrame {
