@@ -96,11 +96,11 @@ impl Sensor {
     pub fn stop_all(&mut self) {
         self.stop_streams();
 
-        if let Some(stream_set) = &mut self.stream_set {
-            close_stream_set(stream_set);
-        }
         if let Some(reader) = &mut self.reader {
             close_reader(reader);
+        }
+        if let Some(stream_set) = &mut self.stream_set {
+            close_stream_set(stream_set);
         }
         terminate();
     }

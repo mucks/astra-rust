@@ -1,7 +1,6 @@
 use super::*;
 
 #[test]
-#[ignore]
 fn test_body_stream() {
     let mut sensor = sensor::Sensor::new();
     if sensor.start().is_ok() && sensor.start_color_stream().is_ok() {
@@ -9,7 +8,7 @@ fn test_body_stream() {
         while index < 100 {
             update();
             if let Ok(_bodies) = sensor.get_bodies() {
-                index += 1
+                index += 1;
             }
         }
     }
