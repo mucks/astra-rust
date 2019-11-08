@@ -1,5 +1,8 @@
 [workspace]
 members = [
     "astra",
+    "astra-core",
+    "astra-model",
+    "astra-wrapper",
     "astra-sys",
 ]

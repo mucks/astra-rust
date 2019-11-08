@@ -1,5 +1,6 @@
-use super::*;
 use crate::err::Error;
+use model::FrameType;
+use wrapper::*;
 
 pub struct Frame {
     frame: AstraFrame,

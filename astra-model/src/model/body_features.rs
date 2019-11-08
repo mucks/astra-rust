@@ -8,6 +8,6 @@ pub enum BodyFeatures {
 impl From<u32> for BodyFeatures {
     fn from(features: u32) -> Self {
         num::FromPrimitive::from_u32(features)
-            .expect(&format!("could not parse body features: {}", features))
+            .unwrap_or_else(|| panic!("could not parse body features: {}", features))
     }
 }

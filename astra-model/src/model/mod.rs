@@ -1,17 +1,21 @@
 mod body;
 mod body_features;
 mod body_status;
+mod frame_type;
 mod joint;
 mod joint_status;
 mod joint_type;
+mod stream_type;
 mod vector2;
 mod vector3;
 
 pub use body::*;
 pub use body_features::*;
 pub use body_status::*;
+pub use frame_type::*;
 pub use joint::*;
 pub use joint_status::*;
 pub use joint_type::*;
+pub use stream_type::*;
 pub use vector2::*;
 pub use vector3::*;

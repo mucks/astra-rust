@@ -1,13 +1,16 @@
 use super::*;
 use crate::err::Error;
+use model::{Body, FrameType, StreamType};
 use std::collections::HashMap;
+use wrapper::*;
 
+#[derive(Default)]
 pub struct Sensor {
     stream_set: Option<StreamSet>,
     reader: Option<Reader>,
     streams: HashMap<StreamType, Stream>,
-    frame_indexes: HashMap<StreamType, Stream>,
-    index: i32,
+    color_frame_index: i32,
+    body_frame_index: i32,
 }
 
 impl Sensor {
@@ -16,15 +19,19 @@ impl Sensor {
             stream_set: None,
             reader: None,
             streams: HashMap::new(),
-            frame_indexes: HashMap::new(),
-            index: -1,
+            color_frame_index: -1,
+            body_frame_index: -1,
         }
+    }
+
+    pub fn update(&self) {
+        update();
     }
 
     pub fn start(&mut self) -> Result<(), Error> {
         if self.stream_set.is_none() && self.reader.is_none() {
             init();
-            let stream_set = get_sensor();
+            let stream_set = get_stream_set();
             let reader = get_reader(stream_set);
             self.stream_set = Some(stream_set);
             self.reader = Some(reader);
@@ -38,7 +45,13 @@ impl Sensor {
         if let Some(reader) = self.reader {
             if let Ok(frame) = frame::Frame::new(reader) {
                 let body_frame = frame.get_body_frame();
-                Ok(get_bodies(body_frame))
+                let index = get_body_frame_index(body_frame);
+                if self.body_frame_index != index {
+                    self.body_frame_index = index;
+                    Ok(get_bodies(body_frame))
+                } else {
+                    Err(Error::NoNewFrameError)
+                }
             } else {
                 Err(Error::CouldNotGetFrameError(FrameType::Body))
             }
@@ -52,8 +65,8 @@ impl Sensor {
             if let Ok(frame) = frame::Frame::new(reader) {
                 let color_frame = frame.get_color_frame();
                 let index = get_color_frame_index(color_frame);
-                if self.index != index {
-                    self.index = index;
+                if self.color_frame_index != index {
+                    self.color_frame_index = index;
 
                     let byte_length = get_color_frame_byte_length(color_frame);
                     Ok(get_color_bytes(color_frame, byte_length as u32))

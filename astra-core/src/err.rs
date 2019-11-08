@@ -1,5 +1,5 @@
-use super::FrameType;
-use super::StreamType;
+use model::FrameType;
+use model::StreamType;
 
 #[derive(Debug)]
 pub enum Error {

@@ -1,29 +1,33 @@
 use super::*;
 
 #[test]
-fn test_body_stream() {
-    let mut sensor = sensor::Sensor::new();
-    if sensor.start().is_ok() && sensor.start_color_stream().is_ok() {
-        let mut index = -1;
-        while index < 100 {
-            update();
-            if let Ok(_bodies) = sensor.get_bodies() {
-                index += 1;
-            }
+#[ignore]
+fn test_body() -> Result<(), Error> {
+    let mut sensor = Sensor::new();
+    sensor.start()?;
+    sensor.start_body_stream()?;
+
+    let mut index = 0;
+    while index < 20 {
+        sensor.update();
+        if let Ok(bodies) = sensor.get_bodies() {
+            index += 1;
         }
     }
+    Ok(())
 }
 
 #[test]
-fn test_color_stream() {
-    let mut sensor = sensor::Sensor::new();
-    if sensor.start().is_ok() && sensor.start_color_stream().is_ok() {
-        let mut index = -1;
-        while index < 100 {
-            update();
-            if let Ok(_bytes) = sensor.get_color_bytes() {
-                index += 1;
-            }
+fn test_color() -> Result<(), Error> {
+    let mut sensor = Sensor::new();
+    sensor.start()?;
+    sensor.start_color_stream()?;
+    let mut index = 0;
+    while index < 20 {
+        sensor.update();
+        if let Ok(bytes) = sensor.get_color_bytes() {
+            index += 1;
         }
     }
+    Ok(())
 }
