@@ -28,6 +28,9 @@ impl Frame {
     pub fn get_masked_color_frame(&self) -> Result<MaskedColorFrame> {
         get_img_frame(ImageFrameType::MaskedColor, self.frame)
     }
+    pub fn get_depth_frame(&self) -> Result<DepthFrame> {
+        get_img_frame(ImageFrameType::Depth, self.frame)
+    }
 }
 
 impl Drop for Frame {

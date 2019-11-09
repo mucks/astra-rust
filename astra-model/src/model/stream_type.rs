@@ -3,4 +3,5 @@ pub enum StreamType {
     Body,
     Color,
     MaskedColor,
+    Depth,
 }
