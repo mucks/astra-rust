@@ -1,4 +1,4 @@
-use model::{ColorMeta, FrameType};
+use model::{ColorMeta, FrameType, ImageFrameType};
 use model::{Error, Result};
 use wrapper::*;
 
@@ -20,13 +20,13 @@ impl Frame {
     }
 
     pub fn get_color_frame(&self) -> Result<ColorFrame> {
-        get_color_frame(self.frame)
+        get_img_frame(ImageFrameType::Color, self.frame)
     }
     pub fn get_body_frame(&self) -> Result<BodyFrame> {
         get_body_frame(self.frame)
     }
     pub fn get_masked_color_frame(&self) -> Result<MaskedColorFrame> {
-        get_masked_color_frame(self.frame)
+        get_img_frame(ImageFrameType::MaskedColor, self.frame)
     }
 }
 

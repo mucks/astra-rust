@@ -1,6 +1,8 @@
 mod body;
 mod color;
+mod depth;
 mod frame;
+mod img;
 mod masked_color;
 mod reader;
 mod stream;
@@ -8,7 +10,9 @@ mod stream_set;
 mod types;
 pub use body::*;
 pub use color::*;
+pub use depth::*;
 pub use frame::*;
+pub use img::*;
 pub use masked_color::*;
 pub use reader::*;
 pub use stream::*;

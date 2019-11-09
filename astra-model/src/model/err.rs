@@ -14,4 +14,5 @@ pub enum Error {
     NoNewFrameError,
     NoUpdateCallError,
     AstraStatusError(AstraStatus),
+    GetImgFrameError,
 }

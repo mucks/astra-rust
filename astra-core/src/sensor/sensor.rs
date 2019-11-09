@@ -59,10 +59,10 @@ impl Sensor {
         }
     }
 
-    pub fn get_masked_color_bytes(&mut self) -> Result<Vec<u8>> {
+    pub fn get_masked_color_bytes(&mut self) -> Result<(u32, u32, usize, Vec<u8>)> {
         if let Ok(frame) = frame::Frame::new(self.reader) {
             let masked_color_frame = frame.get_masked_color_frame()?;
-            let index = get_masked_color_frame_index(masked_color_frame)?;
+            let index = get_img_frame_index(masked_color_frame)?;
             if self.masked_color_frame_index != index {
                 self.masked_color_frame_index = index;
                 get_masked_color_bytes(masked_color_frame)
@@ -79,11 +79,11 @@ impl Sensor {
 
         let mut frame = frame::Frame::new(self.reader)?;
         let color_frame = frame.get_color_frame()?;
-        let frame_index = get_color_frame_index(color_frame);
+        let frame_index = get_img_frame_index(color_frame)?;
         if self.color_frame_index != frame_index {
             self.color_frame_index = frame_index;
-            let (width, height) = get_color_frame_dimensions(color_frame);
-            let byte_length = get_color_frame_byte_length(color_frame);
+            let (width, height) = get_img_frame_dimensions(color_frame)?;
+            let byte_length = get_img_frame_byte_length(color_frame)?;
             frame.color_meta = Some(ColorMeta {
                 frame_index,
                 width,
