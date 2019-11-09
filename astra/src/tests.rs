@@ -7,7 +7,7 @@ fn test_body() -> Result<()> {
 
     let mut index = 0;
     while index < 20 {
-        sensor.update();
+        sensor.update()?;
         if let Ok(bodies) = sensor.get_bodies() {
             index += 1;
         }

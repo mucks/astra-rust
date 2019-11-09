@@ -1,5 +1,6 @@
 use super::stream::start_stream;
 use super::types::*;
+use crate::util::astra_status_to_result;
 use model::{Body, Result, StreamType};
 
 pub fn get_body_frame_index(body_frame: BodyFrame) -> i32 {
@@ -14,11 +15,11 @@ pub fn start_body_stream(reader: Reader) -> Result<Stream> {
     start_stream(reader, StreamType::Body)
 }
 
-pub fn get_body_frame(frame: AstraFrame) -> BodyFrame {
+pub fn get_body_frame(frame: AstraFrame) -> Result<BodyFrame> {
     unsafe {
         let mut body_frame = Box::into_raw(Box::new(sys::_astra_bodyframe::default())) as BodyFrame;
-        sys::astra_frame_get_bodyframe(frame, &mut body_frame);
-        body_frame
+        let status = sys::astra_frame_get_bodyframe(frame, &mut body_frame);
+        astra_status_to_result(status.into(), body_frame)
     }
 }
 

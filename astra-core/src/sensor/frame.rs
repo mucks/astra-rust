@@ -22,8 +22,11 @@ impl Frame {
     pub fn get_color_frame(&self) -> Result<ColorFrame> {
         get_color_frame(self.frame)
     }
-    pub fn get_body_frame(&self) -> BodyFrame {
+    pub fn get_body_frame(&self) -> Result<BodyFrame> {
         get_body_frame(self.frame)
+    }
+    pub fn get_masked_color_frame(&self) -> Result<MaskedColorFrame> {
+        get_masked_color_frame(self.frame)
     }
 }
 

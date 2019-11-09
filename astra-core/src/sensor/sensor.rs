@@ -11,11 +11,12 @@ pub struct Sensor {
     streams: HashMap<StreamType, Stream>,
     body_frame_index: i32,
     color_frame_index: i32,
+    masked_color_frame_index: i32,
 }
 
 impl Sensor {
     pub fn new() -> Result<Sensor> {
-        init();
+        init()?;
         let stream_set = get_stream_set()?;
         let reader = get_reader(stream_set)?;
 
@@ -25,15 +26,16 @@ impl Sensor {
             streams: HashMap::new(),
             body_frame_index: -1,
             color_frame_index: -1,
+            masked_color_frame_index: -1,
         })
     }
-    pub fn update(&self) {
-        update();
+    pub fn update(&self) -> Result<()> {
+        update()
     }
 
     pub fn get_bodies(&mut self) -> Result<Vec<Body>> {
         if let Ok(frame) = frame::Frame::new(self.reader) {
-            let body_frame = frame.get_body_frame();
+            let body_frame = frame.get_body_frame()?;
             let index = get_body_frame_index(body_frame);
             if self.body_frame_index != index {
                 self.body_frame_index = index;
@@ -57,8 +59,23 @@ impl Sensor {
         }
     }
 
+    pub fn get_masked_color_bytes(&mut self) -> Result<Vec<u8>> {
+        if let Ok(frame) = frame::Frame::new(self.reader) {
+            let masked_color_frame = frame.get_masked_color_frame()?;
+            let index = get_masked_color_frame_index(masked_color_frame)?;
+            if self.masked_color_frame_index != index {
+                self.masked_color_frame_index = index;
+                get_masked_color_bytes(masked_color_frame)
+            } else {
+                Err(Error::NoNewFrameError)
+            }
+        } else {
+            Err(Error::CouldNotGetFrameError(FrameType::Body))
+        }
+    }
+
     pub fn update_color(&mut self) -> Result<Frame> {
-        self.update();
+        self.update()?;
 
         let mut frame = frame::Frame::new(self.reader)?;
         let color_frame = frame.get_color_frame()?;
@@ -95,17 +112,18 @@ impl Sensor {
         self.start_stream(StreamType::MaskedColor)
     }
 
-    pub fn stop_streams(&mut self) {
+    pub fn stop_streams(&mut self) -> Result<()> {
         for (_, stream) in &self.streams {
-            stop_stream(*stream);
+            stop_stream(*stream)?;
         }
+        Ok(())
     }
 
-    pub fn stop_all(&mut self) {
-        self.stop_streams();
-        close_reader(&mut self.reader);
-        close_stream_set(&mut self.stream_set);
-        terminate();
+    pub fn stop_all(&mut self) -> Result<()> {
+        self.stop_streams()?;
+        close_reader(&mut self.reader)?;
+        close_stream_set(&mut self.stream_set)?;
+        terminate()
     }
 
     fn start_stream(&mut self, st: StreamType) -> Result<()> {
