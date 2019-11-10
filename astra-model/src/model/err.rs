@@ -4,10 +4,8 @@ use crate::StreamType;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Error {
-    SensorAlreadyStartedError,
-    SensorNotStartedError,
     StreamAlreadyStartedError(StreamType),
     StreamNotStartedError(StreamType),
     CouldNotGetFrameError(FrameType),
@@ -15,4 +13,12 @@ pub enum Error {
     NoUpdateCallError,
     AstraStatusError(AstraStatus),
     GetImgFrameError,
+    SensorNotInitializedError,
+    SensorAlreadyInitializedError,
+}
+
+impl From<&Error> for Error {
+    fn from(error: &Error) -> Self {
+        error.clone()
+    }
 }

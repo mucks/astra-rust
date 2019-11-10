@@ -5,7 +5,7 @@ use model::{Result, StreamType};
 pub fn start_stream(reader: Reader, stream_type: StreamType) -> Result<Stream> {
     use self::StreamType::*;
     unsafe {
-        let mut stream = Box::into_raw(Box::new(sys::_astra_streamconnection::default())) as Stream;
+        let mut stream: Stream = std::ptr::null_mut();
         match stream_type {
             Body => sys::astra_reader_get_bodystream(reader, &mut stream),
             Color => sys::astra_reader_get_colorstream(reader, &mut stream),

@@ -1,4 +1,4 @@
-#[derive(FromPrimitive, Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BodyStatus {
     NotTracking,
     Lost,
@@ -8,7 +8,6 @@ pub enum BodyStatus {
 
 impl From<u8> for BodyStatus {
     fn from(body_status: u8) -> Self {
-        num::FromPrimitive::from_u8(body_status)
-            .unwrap_or_else(|| panic!("could not parse body status: {}", body_status))
+        unsafe { std::mem::transmute(body_status) }
     }
 }

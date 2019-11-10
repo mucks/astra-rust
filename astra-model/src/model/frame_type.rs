@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum FrameType {
     Frame,
     Body,
@@ -8,7 +8,7 @@ pub enum FrameType {
     Depth,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum ImageFrameType {
     Color,
     MaskedColor,

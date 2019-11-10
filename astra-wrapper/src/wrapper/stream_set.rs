@@ -5,8 +5,7 @@ use std::ffi::CString;
 
 pub fn get_stream_set() -> Result<StreamSet> {
     unsafe {
-        let mut stream_set =
-            Box::into_raw(Box::new(sys::_astra_streamsetconnection { _unused: [] })) as StreamSet;
+        let mut stream_set: StreamSet = std::ptr::null_mut();
         let path = CString::new("device/default").unwrap();
         let status = sys::astra_streamset_open(path.as_ptr(), &mut stream_set);
         astra_status_to_result(status.into(), stream_set)

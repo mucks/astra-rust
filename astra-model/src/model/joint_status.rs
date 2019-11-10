@@ -1,4 +1,4 @@
-#[derive(FromPrimitive, Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum JointStatus {
     NotTracked,
     LowConfidence,
@@ -7,7 +7,6 @@ pub enum JointStatus {
 
 impl From<u8> for JointStatus {
     fn from(joint_status: u8) -> Self {
-        num::FromPrimitive::from_u8(joint_status)
-            .unwrap_or_else(|| panic!("could not parse joint status: {}", joint_status))
+        unsafe { std::mem::transmute(joint_status) }
     }
 }

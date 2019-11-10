@@ -5,63 +5,76 @@ use std::collections::HashMap;
 use wrapper::*;
 
 pub struct Sensor {
-    stream_set: StreamSet,
-    reader: Reader,
+    stream_set: Option<StreamSet>,
+    reader: Option<Reader>,
     streams: HashMap<StreamType, Stream>,
     indexes: HashMap<StreamType, i32>,
 }
 
 impl Sensor {
-    pub fn new() -> Result<Sensor> {
-        init()?;
-        let stream_set = get_stream_set()?;
-        let reader = get_reader(stream_set)?;
-
-        Ok(Sensor {
-            stream_set: stream_set,
-            reader: reader,
+    pub fn new() -> Sensor {
+        Sensor {
+            stream_set: None,
+            reader: None,
             streams: HashMap::new(),
-            indexes: [
-                (StreamType::Color, -1),
-                (StreamType::Body, -1),
-                (StreamType::MaskedColor, -1),
-                (StreamType::Depth, -1),
-            ]
-            .iter()
-            .cloned()
-            .collect(),
-        })
+            indexes: HashMap::new(),
+        }
     }
-    pub fn update(&self) -> Result<()> {
-        update()
-    }
-
-    pub fn get_bodies(&mut self) -> Result<Vec<Body>> {
-        if let Ok(frame) = Frame::new(self.reader) {
-            let body_frame = frame.get_body_frame()?;
-            let index = get_body_frame_index(body_frame);
-            let body_frame_index = self.indexes.get_mut(&StreamType::Body).unwrap();
-            if body_frame_index != &index {
-                *body_frame_index = index;
-                Ok(get_bodies(body_frame))
-            } else {
-                Err(Error::NoNewFrameError)
-            }
+    pub fn init(&mut self) -> Result<()> {
+        if self.stream_set.is_none() {
+            init()?;
+            self.init_indexes();
+            self.stream_set = Some(get_stream_set()?);
+            self.reader = Some(get_reader(self.stream_set.unwrap())?);
+            Ok(())
         } else {
-            Err(Error::CouldNotGetFrameError(FrameType::Body))
+            Err(Error::SensorAlreadyInitializedError)
         }
     }
 
-    pub fn get_depth_bytes(&mut self) -> Result<(u32, u32, usize, Vec<u8>)> {
-        self.get_img_bytes(StreamType::Depth)
+    fn init_indexes(&mut self) {
+        self.indexes = [
+            (StreamType::Color, -1),
+            (StreamType::Body, -1),
+            (StreamType::MaskedColor, -1),
+            (StreamType::Depth, -1),
+        ]
+        .iter()
+        .cloned()
+        .collect();
     }
 
-    pub fn get_color_bytes(&mut self) -> Result<(u32, u32, usize, Vec<u8>)> {
-        self.get_img_bytes(StreamType::Color)
+    pub fn update(&self) -> Result<Frame> {
+        update()?;
+        if let Some(reader) = self.reader {
+            Frame::new(reader)
+        } else {
+            Err(Error::SensorNotInitializedError)
+        }
     }
 
-    pub fn get_masked_color_bytes(&mut self) -> Result<(u32, u32, usize, Vec<u8>)> {
-        self.get_img_bytes(StreamType::MaskedColor)
+    pub fn get_bodies(&mut self, frame: &Frame) -> Result<Vec<Body>> {
+        let body_frame = frame.get_body_frame()?;
+        let index = get_body_frame_index(body_frame);
+        let body_frame_index = self.indexes.get_mut(&StreamType::Body).unwrap();
+        if body_frame_index != &index {
+            *body_frame_index = index;
+            Ok(get_bodies(body_frame))
+        } else {
+            Err(Error::NoNewFrameError)
+        }
+    }
+
+    pub fn get_depth_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
+        self.get_img_bytes(frame, StreamType::Depth)
+    }
+
+    pub fn get_color_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
+        self.get_img_bytes(&frame, StreamType::Color)
+    }
+
+    pub fn get_masked_color_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
+        self.get_img_bytes(&frame, StreamType::MaskedColor)
     }
 
     pub fn start_body_stream(&mut self) -> Result<()> {
@@ -82,49 +95,71 @@ impl Sensor {
         for (_, stream) in &self.streams {
             stop_stream(*stream)?;
         }
+        self.streams = HashMap::new();
+        self.init_indexes();
         Ok(())
     }
 
     pub fn stop_all(&mut self) -> Result<()> {
+        println!("closing streams ");
         self.stop_streams()?;
-        close_reader(&mut self.reader)?;
-        close_stream_set(&mut self.stream_set)?;
-        terminate()
+
+        if let Some(reader) = &mut self.reader {
+            println!("closing reader");
+            close_reader(reader)?;
+            self.reader = None;
+        }
+        if let Some(stream_set) = &mut self.stream_set {
+            println!("closing set");
+            close_stream_set(stream_set)?;
+            self.stream_set = None;
+        }
+        if self.reader.is_none() && self.stream_set.is_none() {
+            println!("terminate");
+            //TODO: find out why it causes corrupted double linked list in godot_astra_plugin
+            //terminate()?;
+        }
+        Ok(())
     }
 
     fn start_stream(&mut self, st: StreamType) -> Result<()> {
         if self.streams.contains_key(&st) {
             Err(Error::StreamAlreadyStartedError(st))
         } else {
-            self.streams.insert(st, start_stream(self.reader, st)?);
-            Ok(())
+            if let Some(reader) = self.reader {
+                self.streams.insert(st, start_stream(reader, st)?);
+                Ok(())
+            } else {
+                Err(Error::SensorNotInitializedError)
+            }
         }
     }
-    fn get_img_bytes(&mut self, stream_type: StreamType) -> Result<(u32, u32, usize, Vec<u8>)> {
+    fn get_img_bytes(
+        &mut self,
+        frame: &Frame,
+        stream_type: StreamType,
+    ) -> Result<(u32, u32, usize, Vec<u8>)> {
         use self::StreamType::*;
-        if let Ok(frame) = Frame::new(self.reader) {
-            let img_frame = match stream_type {
-                Color => frame.get_color_frame(),
-                MaskedColor => frame.get_masked_color_frame(),
-                Depth => frame.get_depth_frame(),
-                _ => return Err(Error::GetImgFrameError),
-            }?;
-            let index = get_img_frame_index(img_frame)?;
-            let frame_index = self.indexes.get_mut(&stream_type).unwrap();
-            if frame_index != &index {
-                *frame_index = index;
 
-                match stream_type {
-                    Color => get_color_bytes(img_frame),
-                    MaskedColor => get_masked_color_bytes(img_frame),
-                    Depth => get_depth_bytes(img_frame),
-                    _ => Err(Error::GetImgFrameError),
-                }
-            } else {
-                Err(Error::NoNewFrameError)
+        let img_frame = match stream_type {
+            Color => frame.get_color_frame(),
+            MaskedColor => frame.get_masked_color_frame(),
+            Depth => frame.get_depth_frame(),
+            _ => return Err(Error::GetImgFrameError),
+        }?;
+        let index = get_img_frame_index(img_frame)?;
+        let frame_index = self.indexes.get_mut(&stream_type).unwrap();
+        if frame_index != &index {
+            *frame_index = index;
+
+            match stream_type {
+                Color => get_color_bytes(img_frame),
+                MaskedColor => get_masked_color_bytes(img_frame),
+                Depth => get_depth_bytes(img_frame),
+                _ => Err(Error::GetImgFrameError),
             }
         } else {
-            Err(Error::CouldNotGetFrameError(FrameType::Body))
+            Err(Error::NoNewFrameError)
         }
     }
 }

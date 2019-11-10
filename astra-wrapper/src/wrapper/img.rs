@@ -5,8 +5,7 @@ use model::{Error, Result};
 
 pub fn get_img_frame(img_frame_type: ImageFrameType, frame: AstraFrame) -> Result<ImageFrame> {
     unsafe {
-        let mut img_frame =
-            Box::into_raw(Box::new(sys::_astra_imageframe::default())) as ImageFrame;
+        let mut img_frame: ImageFrame = std::ptr::null_mut();
 
         let status = match img_frame_type {
             Color => sys::astra_frame_get_colorframe(frame, &mut img_frame),
