@@ -1,2 +1,1 @@
-*.c
-astra-sys/astra_headers
+astra-sys/astra_headers/* linguist-vendored
