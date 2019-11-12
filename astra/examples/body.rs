@@ -1,39 +1,3 @@
-# Astra SDK bindings for Rust
-
-Rust bindings to the [Orbbec Astra Sdk](https://orbbec3d.com/develop/)
-
-## Prerequisites to use this library
-
-1. Download and install the [Orbbec Astra Sdk](https://orbbec3d.com/develop/)
-2. make sure you have these envs in your .bashrc or .profile
-
-```bash
-# adjust astra home to your astra_sdk path
-export ASTRA_HOME=$HOME/astra
-export ASTRA_SDK_INCLUDE=$ASTRA_HOME/include
-export ASTRA_SDK_LIB=$ASTRA_HOME/lib
-# this is so that rust executables know where to find the astra libs
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ASTRA_SDK_LIB
-```
-
-### Example
-
-Starting with an empty project
-
-```bash
-cargo init --bin
-```
-
-add dependency
-
-```toml
-[dependecies]
-astra = { git = "https://github.com/rustmain/astra-rust" }
-```
-
-Get first 200 body frames
-
-```rust
 fn main() -> astra::Result<()> {
     // will stop automatically if fallen out of context
     let mut sensor = astra::Sensor::new();
@@ -57,5 +21,3 @@ fn main() -> astra::Result<()> {
     }
     Ok(())
 }
-```
-

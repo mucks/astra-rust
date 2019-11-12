@@ -64,6 +64,18 @@ impl Sensor {
             Err(Error::NoNewFrameError)
         }
     }
+    pub fn get_body_index(&self) -> i32 {
+        self.indexes[&StreamType::Body]
+    }
+    pub fn get_color_index(&self) -> i32 {
+        self.indexes[&StreamType::Color]
+    }
+    pub fn get_depth_index(&self) -> i32 {
+        self.indexes[&StreamType::Depth]
+    }
+    pub fn get_masked_color_index(&self) -> i32 {
+        self.indexes[&StreamType::MaskedColor]
+    }
 
     pub fn get_depth_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
         self.get_img_bytes(frame, StreamType::Depth)
@@ -117,7 +129,7 @@ impl Sensor {
         if self.reader.is_none() && self.stream_set.is_none() {
             println!("terminate");
             //TODO: find out why it causes corrupted double linked list in godot_astra_plugin
-            //terminate()?;
+            terminate()?;
         }
         Ok(())
     }
