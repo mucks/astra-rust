@@ -1,0 +1,3 @@
+[submodule "astra-sys/astra-sdk"]
+	path = astra-sys/astra-sdk
+	url = https://github.com/rustmain/astra-sdk

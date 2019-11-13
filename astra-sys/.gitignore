@@ -1,0 +1,3 @@
+AstraSDK*/*
+!AstraSDK*/lib
+!AstraSDK*/include/astra/capi
