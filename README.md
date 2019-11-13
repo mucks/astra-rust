@@ -16,8 +16,6 @@ export ASTRA_SDK_LIB=$ASTRA_HOME/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ASTRA_SDK_LIB
 ```
 
-* add "source ~/.profile" to your .bashrc and .xinitrc if you haven't already
-
 ### Example
 
 Starting with an empty project
