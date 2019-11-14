@@ -11,6 +11,7 @@ pub fn start_stream(reader: Reader, stream_type: StreamType) -> Result<Stream> {
             Color => sys::astra_reader_get_colorstream(reader, &mut stream),
             MaskedColor => sys::astra_reader_get_maskedcolorstream(reader, &mut stream),
             Depth => sys::astra_reader_get_depthstream(reader, &mut stream),
+            Infrared => sys::astra_reader_get_infraredstream(reader, &mut stream),
         };
         let status = sys::astra_stream_start(stream);
         astra_status_to_result(status.into(), stream)

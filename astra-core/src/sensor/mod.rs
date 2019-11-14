@@ -1,8 +1,10 @@
 use crate::frame::Frame;
-use model::{Body, ColorData, ColorMeta, FrameType, ImageFrameType, StreamType};
+use model::{Body, StreamType};
 use model::{Error, Result};
 use std::collections::HashMap;
 use wrapper::*;
+
+mod img;
 
 pub struct Sensor {
     stream_set: Option<StreamSet>,
@@ -38,6 +40,7 @@ impl Sensor {
             (StreamType::Body, -1),
             (StreamType::MaskedColor, -1),
             (StreamType::Depth, -1),
+            (StreamType::Infrared, -1),
         ]
         .iter()
         .cloned()
@@ -67,40 +70,9 @@ impl Sensor {
     pub fn get_body_index(&self) -> i32 {
         self.indexes[&StreamType::Body]
     }
-    pub fn get_color_index(&self) -> i32 {
-        self.indexes[&StreamType::Color]
-    }
-    pub fn get_depth_index(&self) -> i32 {
-        self.indexes[&StreamType::Depth]
-    }
-    pub fn get_masked_color_index(&self) -> i32 {
-        self.indexes[&StreamType::MaskedColor]
-    }
-
-    pub fn get_depth_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
-        self.get_img_bytes(frame, StreamType::Depth)
-    }
-
-    pub fn get_color_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
-        self.get_img_bytes(&frame, StreamType::Color)
-    }
-
-    pub fn get_masked_color_bytes(&mut self, frame: &Frame) -> Result<(u32, u32, usize, Vec<u8>)> {
-        self.get_img_bytes(&frame, StreamType::MaskedColor)
-    }
 
     pub fn start_body_stream(&mut self) -> Result<()> {
         self.start_stream(StreamType::Body)
-    }
-
-    pub fn start_color_stream(&mut self) -> Result<()> {
-        self.start_stream(StreamType::Color)
-    }
-    pub fn start_masked_color_stream(&mut self) -> Result<()> {
-        self.start_stream(StreamType::MaskedColor)
-    }
-    pub fn start_depth_stream(&mut self) -> Result<()> {
-        self.start_stream(StreamType::Depth)
     }
 
     pub fn stop_streams(&mut self) -> Result<()> {
@@ -144,34 +116,6 @@ impl Sensor {
             } else {
                 Err(Error::SensorNotInitializedError)
             }
-        }
-    }
-    fn get_img_bytes(
-        &mut self,
-        frame: &Frame,
-        stream_type: StreamType,
-    ) -> Result<(u32, u32, usize, Vec<u8>)> {
-        use self::StreamType::*;
-
-        let img_frame = match stream_type {
-            Color => frame.get_color_frame(),
-            MaskedColor => frame.get_masked_color_frame(),
-            Depth => frame.get_depth_frame(),
-            _ => return Err(Error::GetImgFrameError),
-        }?;
-        let index = get_img_frame_index(img_frame)?;
-        let frame_index = self.indexes.get_mut(&stream_type).unwrap();
-        if frame_index != &index {
-            *frame_index = index;
-
-            match stream_type {
-                Color => get_color_bytes(img_frame),
-                MaskedColor => get_masked_color_bytes(img_frame),
-                Depth => get_depth_bytes(img_frame),
-                _ => Err(Error::GetImgFrameError),
-            }
-        } else {
-            Err(Error::NoNewFrameError)
         }
     }
 }

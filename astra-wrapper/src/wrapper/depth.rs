@@ -16,12 +16,8 @@ pub fn get_depth_data(depth_frame: DepthFrame) -> Result<(u32, u32, usize, Vec<i
     }
 }
 
-pub fn get_depth_bytes(depth_frame: DepthFrame) -> Result<(u32, u32, usize, Vec<u8>)> {
+pub fn get_depth_bytes(depth_frame: DepthFrame, bytes: &mut Vec<u8>) -> Result<()> {
     let (width, height, depth_length, data) = get_depth_data(depth_frame)?;
-
-    let mut bytes: Vec<u8> = Vec::new();
-    bytes.resize(depth_length, 0);
-
     for y in 0..height {
         for x in 0..width {
             let dest_index = (y * width + x) as usize;
@@ -29,5 +25,5 @@ pub fn get_depth_bytes(depth_frame: DepthFrame) -> Result<(u32, u32, usize, Vec<
             bytes[dest_index] = depth;
         }
     }
-    astra_status_to_result(AstraStatus::Success, (width, height, depth_length, bytes))
+    astra_status_to_result(AstraStatus::Success, ())
 }

@@ -4,4 +4,5 @@ pub enum StreamType {
     Color,
     MaskedColor,
     Depth,
+    Infrared,
 }

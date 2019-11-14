@@ -7,3 +7,4 @@ pub type ColorFrame = sys::astra_colorframe_t;
 pub type BodyFrame = sys::astra_bodyframe_t;
 pub type MaskedColorFrame = sys::astra_maskedcolorframe_t;
 pub type DepthFrame = sys::astra_depthframe_t;
+pub type InfraredFrame = sys::astra_infraredframe_t;

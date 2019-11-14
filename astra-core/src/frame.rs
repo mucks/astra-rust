@@ -1,4 +1,4 @@
-use model::{ColorMeta, FrameType, ImageFrameType};
+use model::{ColorMeta, FrameType, StreamType};
 use model::{Error, Result};
 use wrapper::*;
 
@@ -19,17 +19,23 @@ impl Frame {
         }
     }
 
+    pub fn get_img_frame(&self, stream_type: StreamType) -> Result<ImageFrame> {
+        get_img_frame(stream_type, self.frame)
+    }
+    pub fn get_infrared_frame(&self) -> Result<InfraredFrame> {
+        get_img_frame(StreamType::Infrared, self.frame)
+    }
     pub fn get_color_frame(&self) -> Result<ColorFrame> {
-        get_img_frame(ImageFrameType::Color, self.frame)
+        get_img_frame(StreamType::Color, self.frame)
     }
     pub fn get_body_frame(&self) -> Result<BodyFrame> {
         get_body_frame(self.frame)
     }
     pub fn get_masked_color_frame(&self) -> Result<MaskedColorFrame> {
-        get_img_frame(ImageFrameType::MaskedColor, self.frame)
+        get_img_frame(StreamType::MaskedColor, self.frame)
     }
     pub fn get_depth_frame(&self) -> Result<DepthFrame> {
-        get_img_frame(ImageFrameType::Depth, self.frame)
+        get_img_frame(StreamType::Depth, self.frame)
     }
 }
 
