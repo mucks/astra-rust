@@ -1,8 +1,11 @@
 use super::types::{AstraFrame, Reader};
+use crate::util::astra_status_to_result;
+use model::Result;
 
-pub fn close_frame(frame: &mut AstraFrame) {
+pub fn close_frame(frame: &mut AstraFrame) -> Result<()> {
     unsafe {
-        sys::astra_reader_close_frame(frame);
+        let status = sys::astra_reader_close_frame(frame);
+        astra_status_to_result(status.into(), ())
     }
 }
 

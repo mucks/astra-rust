@@ -27,6 +27,11 @@ pub fn get_bodies(body_frame: BodyFrame) -> Vec<Body> {
     unsafe {
         let mut body_list = sys::astra_body_list_t::default();
         sys::astra_bodyframe_body_list(body_frame, &mut body_list);
-        body_list.bodies.iter().map(|b| b.into()).collect()
+        body_list
+            .bodies
+            .iter()
+            .filter(|b| b.status == sys::_astra_body_status_ASTRA_BODY_STATUS_TRACKING as u8)
+            .map(|b| b.into())
+            .collect()
     }
 }

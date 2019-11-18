@@ -1,4 +1,4 @@
-#[derive(Clone, Hash, PartialEq, Eq, Debug)]
+#[derive(Clone, Hash, PartialEq, Eq, Debug, Copy)]
 pub enum JointType {
     Head,
     ShoulderSpine,
@@ -20,6 +20,19 @@ pub enum JointType {
     RightWrist,
     Neck,
     Unknown = 255,
+}
+
+#[cfg(feature = "godot")]
+impl gdnative::ToVariant for JointType {
+    fn to_variant(&self) -> gdnative::Variant {
+        gdnative::Variant::from_u64(*self as u64)
+    }
+}
+
+impl Default for JointType {
+    fn default() -> Self {
+        Self::Unknown
+    }
 }
 
 impl From<u8> for JointType {

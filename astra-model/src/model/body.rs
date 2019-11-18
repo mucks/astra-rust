@@ -1,11 +1,15 @@
 use super::*;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
+#[cfg_attr(feature = "godot", derive(gdnative::ToVariant))]
 pub struct Body {
     pub features: BodyFeatures,
     pub center_of_mass: Vector3,
+    #[cfg(not(feature = "godot"))]
     pub joints: HashMap<JointType, Joint>,
+    #[cfg(feature = "godot")]
+    pub joints: gdnative::Dictionary,
     pub hand_poses: u32,
     pub id: u8,
     pub status: BodyStatus,

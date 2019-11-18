@@ -48,6 +48,7 @@ fn test_infrared() -> Result<()> {
 }
 
 #[test]
+#[ignore]
 fn masked_color() -> Result<()> {
     let mut sensor = Sensor::new();
     sensor.init()?;
@@ -60,6 +61,24 @@ fn masked_color() -> Result<()> {
             println!("{:?}", time.elapsed().unwrap().as_micros());
         }
         index = sensor.get_masked_color_index();
+    }
+    Ok(())
+}
+
+#[test]
+fn body() -> Result<()> {
+    let mut sensor = Sensor::new();
+    sensor.init()?;
+    sensor.start_body_stream()?;
+    let mut index = 0;
+    while index < 200 {
+        if let Ok(frame) = sensor.update() {
+            let time = std::time::SystemTime::now();
+            if let Ok(bodies) = sensor.get_bodies(&frame) {
+                println!("{:?}", time.elapsed().unwrap().as_micros());
+            }
+        }
+        index = sensor.get_body_index();
     }
     Ok(())
 }

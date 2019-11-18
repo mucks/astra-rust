@@ -16,6 +16,13 @@ export ASTRA_SDK_LIB=$ASTRA_HOME/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ASTRA_SDK_LIB
 ```
 
+### Compiling to Android with feature godot
+
+* The gdnative-sys dependency requires openjdk-8 headers to be in /usr/include
+* install openjdk-8
+* sudo cp -r /usr/lib/jvm/java-8-openjdk/include /usr/include
+* sudo cp -r /usr/lib/jvm/java-8-openjdk/linux/include /usr/include
+
 ### Example
 
 Starting with an empty project

@@ -1,4 +1,5 @@
-#[derive(Debug)]
+#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(feature = "godot", derive(gdnative::ToVariant))]
 pub struct Vector2 {
     pub x: f32,
     pub y: f32,
