@@ -6,6 +6,7 @@ use wrapper::*;
 
 mod img;
 
+#[derive(Default)]
 pub struct Sensor {
     stream_set: Option<StreamSet>,
     reader: Option<Reader>,
@@ -14,13 +15,8 @@ pub struct Sensor {
 }
 
 impl Sensor {
-    pub fn new() -> Sensor {
-        Sensor {
-            stream_set: None,
-            reader: None,
-            streams: HashMap::new(),
-            indexes: HashMap::new(),
-        }
+    pub fn new() -> Self {
+        Self::default()
     }
     pub fn init(&mut self) -> Result<()> {
         if self.stream_set.is_none() {
@@ -34,6 +30,14 @@ impl Sensor {
         }
     }
 
+    pub fn update(&self) -> Result<Frame> {
+        update()?;
+        if let Some(reader) = self.reader {
+            Frame::new(reader)
+        } else {
+            Err(Error::SensorNotInitializedError)
+        }
+    }
     fn init_indexes(&mut self) {
         self.indexes = [
             (StreamType::Color, -1),
@@ -45,15 +49,6 @@ impl Sensor {
         .iter()
         .cloned()
         .collect();
-    }
-
-    pub fn update(&self) -> Result<Frame> {
-        update()?;
-        if let Some(reader) = self.reader {
-            Frame::new(reader)
-        } else {
-            Err(Error::SensorNotInitializedError)
-        }
     }
 
     pub fn get_bodies(&mut self, frame: &Frame) -> Result<Vec<Body>> {
