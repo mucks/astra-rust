@@ -4,6 +4,9 @@ use crate::*;
 use model::StreamType::{self, *};
 use model::{AstraStatus, Error, Result};
 
+#[cfg(feature = "godot")]
+use model::gdnative;
+
 pub fn get_bytes(img_frame: ImageFrame) -> Result<(u32, u32, usize, Vec<u8>)> {
     let (width, height) = get_img_frame_dimensions(img_frame)?;
     let byte_length = get_img_frame_byte_length(img_frame)?;
@@ -15,6 +18,31 @@ pub fn get_bytes(img_frame: ImageFrame) -> Result<(u32, u32, usize, Vec<u8>)> {
         astra_status_to_result(status.into(), (width, height, byte_length, data))
     }
 }
+
+#[cfg(feature = "godot")]
+pub fn get_img(img_frame: ImageFrame, stream_type: StreamType) -> Result<gdnative::Image> {
+    let (width, height) = get_img_frame_dimensions(img_frame)?;
+    let mut image = gdnative::Image::new();
+
+    let byte_length = get_img_frame_byte_length(img_frame)?;
+    let mut byte_array = gdnative::ByteArray::new();
+    byte_array.resize(byte_length as i32);
+
+    let status = unsafe {
+        sys::astra_imageframe_copy_data(img_frame, byte_array.write().as_mut_ptr() as *mut _)
+    };
+    if AstraStatus::from(status) == AstraStatus::Success {
+        image.create_from_data(
+            width as i64,
+            height as i64,
+            false,
+            stream_type.godot_image_format(),
+            byte_array,
+        );
+    }
+    astra_status_to_result(status.into(), image)
+}
+
 pub fn copy_bytes(img_frame: ImageFrame, ptr: *mut u8) -> Result<()> {
     unsafe {
         let status = sys::astra_imageframe_copy_data(img_frame, ptr as *mut _);

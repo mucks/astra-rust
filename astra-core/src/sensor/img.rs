@@ -4,6 +4,9 @@ use crate::frame::Frame;
 use model::{Error, Result, StreamType};
 use wrapper::*;
 
+#[cfg(feature = "godot")]
+use model::gdnative;
+
 impl Sensor {
     fn get_img_bytes(
         &mut self,
@@ -34,6 +37,20 @@ impl Sensor {
             Ok(true)
         } else {
             Ok(false)
+        }
+    }
+
+    #[cfg(feature = "godot")]
+    pub fn get_img(&mut self, frame: &Frame, stream_type: StreamType) -> Result<gdnative::Image> {
+        let img_frame = frame.get_img_frame(stream_type)?;
+        let index = get_img_frame_index(img_frame)?;
+        let frame_index = self.indexes.get_mut(&stream_type).unwrap();
+        if frame_index != &index {
+            *frame_index = index;
+
+            get_img(img_frame, stream_type)
+        } else {
+            Err(Error::NoNewFrameError)
         }
     }
 

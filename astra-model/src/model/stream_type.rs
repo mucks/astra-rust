@@ -6,3 +6,15 @@ pub enum StreamType {
     Depth,
     Infrared,
 }
+
+impl StreamType {
+    #[cfg(feature = "godot")]
+    pub fn godot_image_format(&self) -> i64 {
+        match self {
+            StreamType::Color => 4,
+            StreamType::MaskedColor => 5,
+            StreamType::Depth => 0,
+            _ => 0,
+        }
+    }
+}
